@@ -48,6 +48,7 @@ func _ready() -> void:
 	if _shared_mat == null:
 		_shared_mat = ShaderMaterial.new()
 		_shared_mat.shader = SHADER
+	_shared_mat.set_shader_parameter("night", FX.night)
 	position = Vector3(center.x, 0, center.y)
 	rect = Rect2(center - Vector2(size.x, size.z) * 0.5, Vector2(size.x, size.z))
 	_visual = Node3D.new()
@@ -74,6 +75,7 @@ func _ready() -> void:
 		m.set_shader_parameter("window_color", window_color)
 		m.set_shader_parameter("height_half", size.y * 0.5)
 		m.set_shader_parameter("facade_seed", seed_value)
+		m.set_shader_parameter("night", FX.night)
 		_mesh.material_override = m
 		collision_layer = 0
 		collision_mask = 0
@@ -115,8 +117,8 @@ func _add_details() -> void:
 	if kind == "watchtower":
 		# Cabin on top and a red aviation light.
 		MechBuilder.box(_visual, Vector3(size.x + 2.0, 2.4, size.z + 2.0), Vector3(0, top + 1.2, 0), FX.mat(Color(0.3, 0.2, 0.12), 0.1, 0.8))
-		MechBuilder.box(_visual, Vector3(size.x + 1.5, 0.5, size.z + 1.5), Vector3(0, top + 1.2, 0), FX.glow(Color(1.0, 0.75, 0.4), 3.0))
-		MechBuilder.ball(_visual, 0.4, Vector3(0, top + 3.0, 0), FX.glow(Color(1.0, 0.1, 0.1), 6.0))
+		MechBuilder.box(_visual, Vector3(size.x + 1.5, 0.5, size.z + 1.5), Vector3(0, top + 1.2, 0), FX.light_mat(Color(1.0, 0.75, 0.4), 3.0))
+		MechBuilder.ball(_visual, 0.4, Vector3(0, top + 3.0, 0), FX.light_mat(Color(1.0, 0.1, 0.1), 6.0))
 		return
 	var dark := FX.mat(base_color.darkened(0.5), 0.4, 0.6)
 	# Roof clutter: AC units, a water tank or an antenna with a blinking light.
@@ -126,17 +128,17 @@ func _add_details() -> void:
 		MechBuilder.box(_visual, Vector3(randf_range(1.2, 2.4), 1.2, randf_range(1.2, 2.4)), p, dark)
 	if size.y > 14.0:
 		MechBuilder.cyl(_visual, 0.12, 0.2, 5.0, Vector3(size.x * 0.25, top + 2.5, size.z * 0.2), dark)
-		MechBuilder.ball(_visual, 0.35, Vector3(size.x * 0.25, top + 5.1, size.z * 0.2), FX.glow(Color(1.0, 0.1, 0.1), 6.0))
+		MechBuilder.ball(_visual, 0.35, Vector3(size.x * 0.25, top + 5.1, size.z * 0.2), FX.light_mat(Color(1.0, 0.1, 0.1), 6.0))
 	elif kind == "shop":
 		MechBuilder.cyl(_visual, 1.2, 1.2, 2.0, Vector3(-size.x * 0.25, top + 1.0, -size.z * 0.2), dark)
 		# Glowing shop-front awning facing the street.
-		MechBuilder.box(_visual, Vector3(size.x * 0.9, 0.4, 0.8), Vector3(0, 3.2, size.z * 0.5 + 0.4), FX.glow(neon_color, 2.0))
+		MechBuilder.box(_visual, Vector3(size.x * 0.9, 0.4, 0.8), Vector3(0, 3.2, size.z * 0.5 + 0.4), FX.light_mat(neon_color, 2.0))
 	if neon:
 		# Vertical neon sign on one corner, horizontal strip on the roof edge.
 		var side := 1.0 if randf() < 0.5 else -1.0
 		var h := minf(size.y * 0.6, 12.0)
-		MechBuilder.box(_visual, Vector3(0.4, h, 1.6), Vector3(side * (size.x * 0.5 + 0.2), size.y - h * 0.5 - 1.0, size.z * 0.3), FX.glow(neon_color, 5.0))
-		MechBuilder.box(_visual, Vector3(size.x, 0.35, 0.35), Vector3(0, top - 0.2, size.z * 0.5 + 0.15), FX.glow(neon_color.lerp(Color.WHITE, 0.3), 4.0))
+		MechBuilder.box(_visual, Vector3(0.4, h, 1.6), Vector3(side * (size.x * 0.5 + 0.2), size.y - h * 0.5 - 1.0, size.z * 0.3), FX.light_mat(neon_color, 5.0))
+		MechBuilder.box(_visual, Vector3(size.x, 0.35, 0.35), Vector3(0, top - 0.2, size.z * 0.5 + 0.15), FX.light_mat(neon_color.lerp(Color.WHITE, 0.3), 4.0))
 
 
 ## Pitched roof: a prism along the building's long axis.
@@ -157,7 +159,7 @@ func _add_roof() -> void:
 	if kind == "barn":
 		# Big doors and a hay-loft light so barns read at a glance.
 		MechBuilder.box(_visual, Vector3(size.x * 0.4, size.y * 0.6, 0.2), Vector3(0, size.y * 0.3, size.z * 0.5 + 0.1), FX.mat(Color(0.85, 0.82, 0.75), 0.0, 0.8))
-		MechBuilder.box(_visual, Vector3(1.4, 1.0, 0.2), Vector3(0, size.y * 0.8, size.z * 0.5 + 0.1), FX.glow(Color(1.0, 0.75, 0.4), 3.0))
+		MechBuilder.box(_visual, Vector3(1.4, 1.0, 0.2), Vector3(0, size.y * 0.8, size.z * 0.5 + 0.1), FX.light_mat(Color(1.0, 0.75, 0.4), 3.0))
 	else:
 		MechBuilder.box(_visual, Vector3(0.6, h + 1.0, 0.6), Vector3(size.x * 0.25, size.y + h * 0.5 + 0.5, size.z * 0.15), FX.mat(Color(0.25, 0.2, 0.18), 0.0, 0.9))
 
@@ -197,7 +199,7 @@ func _start_smoke() -> void:
 	_smoke.gravity = Vector3(1.5, 1.0, 0.5)
 	_smoke.scale_amount_min = 2.0
 	_smoke.scale_amount_max = 4.0
-	_smoke.color = Color(0.1, 0.1, 0.11, 0.6)
+	_smoke.color = Color(0.1, 0.1, 0.11, 0.6).lerp(Color(0.3, 0.3, 0.32, 0.6), 1.0 - FX.night)
 	_smoke.color_ramp = FX._fade_ramp
 	_smoke.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
 	_smoke.emission_box_extents = Vector3(size.x * 0.3, 0.5, size.z * 0.3)

@@ -1,13 +1,15 @@
 # Mech Hero
 
 An isometric mech-vs-kaiju roguelite shooter, inspired by Archero's stage-by-stage
-upgrade loop, Japanese mecha and giant-monster films. You pilot a towering mech
-through a neon city at night, clearing waves of enemy machines in bullet-hell fights
-while the city comes down around you. Between stages you pick one of three upgrades.
-Stage 10 is a kaiju.
+upgrade loop and bright toy-like look, Japanese mecha and giant-monster films. You
+pilot a towering mech through farmland, suburbs, forests and cities, clearing waves
+of enemy machines in bullet-hell fights while everything comes down around you.
+Between stages you pick one of three upgrades. Stage 10 is a kaiju.
 
 Built with **Godot 4.5** (GDScript). Everything is made from primitives, shaders and
-particles, so there are no art assets.
+particles, so there are no art assets. The look is sunny and cel-shaded, with dark
+outlines on the mechs and cars. Each stage sets its `time` in `data/stages.gd`:
+`day` (the default), `sunset`, or `night` for the neon look.
 
 ## Running
 

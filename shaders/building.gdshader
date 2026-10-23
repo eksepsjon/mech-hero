@@ -1,5 +1,8 @@
 // Gameplay building: per-instance colours and state, packed into three vec4 slots.
 shader_type spatial;
+render_mode diffuse_toon, specular_toon;
+
+uniform float night = 0.0;
 
 instance uniform vec4 base_color : source_color = vec4(0.25, 0.27, 0.32, 1.0);
 instance uniform vec4 window_color : source_color = vec4(1.0, 0.8, 0.5, 1.0);
@@ -23,7 +26,7 @@ void fragment() {
 	vec3 albedo;
 	vec3 emission;
 	float rough;
-	facade(base_color.rgb, window_color, params, TIME, albedo, emission, rough);
+	facade(base_color.rgb, window_color, params, TIME, night, albedo, emission, rough);
 	ALBEDO = albedo;
 	EMISSION = emission;
 	ROUGHNESS = rough;

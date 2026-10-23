@@ -11,9 +11,10 @@ var _boom := 2.0
 
 
 func _ready() -> void:
+	FX.set_time("day")
 	var arena = Arena.new()
 	arena.variant = ["downtown", "harbor", "highway", "mixed", "rural", "forest"][randi() % 6]
-	add_child(Env.build(false, arena.variant in ["rural", "forest"]))
+	add_child(Env.build("day", arena.variant in ["rural", "forest"]))
 	arena.gen_seed = randi()
 	add_child(arena)
 	_cam = Camera3D.new()

@@ -49,7 +49,7 @@ func _configure() -> void:
 	model.scale = Vector3.ONE * 1.15
 	# A huge model under constant fire would read as a white blob with the normal flash.
 	flash_material = FX.flash_mat_soft
-	_laser_tele = _make_beam(Vector3(0.8, 0.1, 150.0), FX.glow_add(RED, 3.0, 0.5))
+	_laser_tele = _make_beam(Vector3(1.2, 0.1, 150.0), FX.glow_mix(RED, 1.4, 0.7))
 	_laser_mat = FX.glow_add(Color(1.0, 0.4, 0.9), 5.0, 0.9)
 	_laser_beam = _make_beam(Vector3(4.5, 4.5, 150.0), _laser_mat)
 

@@ -4,6 +4,7 @@ extends Node
 
 const PARTICLE_SHADER := preload("res://shaders/particle_add.gdshader")
 const GLOW_SHADER := preload("res://shaders/glow_add.gdshader")
+const GLOW_MIX_SHADER := preload("res://shaders/glow_mix.gdshader")
 const Telegraph := preload("res://scenes/fx/telegraph.gd")
 
 const MAX_LIGHTS := 8
@@ -11,6 +12,9 @@ const MAX_NUMBERS := 40
 const MAX_BURSTS := 110
 
 var trauma := 0.0
+## 0 = day, 1 = night. Set per stage via set_time(); drives signs, windows, ground.
+var night := 0.0
+var _outline_mat: StandardMaterial3D
 var flash_mat: StandardMaterial3D
 var flash_mat_soft: StandardMaterial3D
 var _mats: Dictionary = {}
@@ -41,11 +45,18 @@ func _ready() -> void:
 	_smoke_mat.vertex_color_use_as_albedo = true
 	_smoke_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_smoke_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	# Inverted-hull outline used as a next pass on mech and car materials.
+	_outline_mat = StandardMaterial3D.new()
+	_outline_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_outline_mat.cull_mode = BaseMaterial3D.CULL_FRONT
+	_outline_mat.grow = true
+	_outline_mat.grow_amount = 0.12
+	_outline_mat.albedo_color = Color(0.08, 0.08, 0.12)
 	# Additive overlay: brightens whatever it covers instead of painting it white.
 	flash_mat = StandardMaterial3D.new()
 	flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	flash_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	flash_mat.albedo_color = Color(0.55, 0.55, 0.6)
+	flash_mat.albedo_color = Color(0.35, 0.35, 0.38)
 	flash_mat_soft = flash_mat.duplicate()
 	flash_mat_soft.albedo_color = Color(0.12, 0.1, 0.14)
 
@@ -70,17 +81,45 @@ func hitstop(duration: float) -> void:
 	_hitstop = false
 
 
+# --- time of day -----------------------------------------------------------------
+
+const TIMES := {"day": 0.0, "sunset": 0.35, "night": 1.0}
+
+
+func set_time(time: String) -> void:
+	night = TIMES.get(time, 0.0)
+
+
 # --- materials ----------------------------------------------------------------
 
-## Cached lit material.
-func mat(color: Color, metallic: float = 0.3, roughness: float = 0.6) -> StandardMaterial3D:
-	var key := "m%s|%.2f|%.2f" % [color.to_html(), metallic, roughness]
+## Cached cel-shaded material, optionally with a dark outline pass.
+func mat(color: Color, metallic: float = 0.3, roughness: float = 0.6, outline: bool = false) -> StandardMaterial3D:
+	var key := "m%s|%.2f|%.2f|%s" % [color.to_html(), metallic, roughness, outline]
 	if _mats.has(key):
 		return _mats[key]
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
-	m.metallic = metallic
+	m.metallic = metallic * 0.4
 	m.roughness = roughness
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
+	m.specular_mode = BaseMaterial3D.SPECULAR_TOON
+	if outline:
+		m.next_pass = _outline_mat
+	_mats[key] = m
+	return m
+
+
+## Light fixture / sign: glows at night, a plain bright colour by day.
+func light_mat(color: Color, energy: float = 4.0) -> StandardMaterial3D:
+	if night >= 0.5:
+		return glow(color, energy)
+	var key := "s%s" % color.to_html()
+	if _mats.has(key):
+		return _mats[key]
+	var m := mat(color.lerp(Color.WHITE, 0.15), 0.0, 0.5).duplicate()
+	m.emission_enabled = true
+	m.emission = color
+	m.emission_energy_multiplier = 0.25
 	_mats[key] = m
 	return m
 
@@ -103,6 +142,16 @@ func glow(color: Color, energy: float = 4.0) -> StandardMaterial3D:
 func glow_add(color: Color, energy: float = 3.0, alpha: float = 1.0) -> ShaderMaterial:
 	var m := ShaderMaterial.new()
 	m.shader = GLOW_SHADER
+	m.set_shader_parameter("color", color)
+	m.set_shader_parameter("energy", energy)
+	m.set_shader_parameter("alpha", alpha)
+	return m
+
+
+## New alpha-blended material for telegraph lines (reads on bright ground).
+func glow_mix(color: Color, energy: float = 1.5, alpha: float = 1.0) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = GLOW_MIX_SHADER
 	m.set_shader_parameter("color", color)
 	m.set_shader_parameter("energy", energy)
 	m.set_shader_parameter("alpha", alpha)
@@ -182,7 +231,7 @@ func dust(pos: Vector3, scale: float = 1.0) -> void:
 
 
 func smoke(pos: Vector3, scale: float = 1.0) -> void:
-	burst(pos, Color(0.12, 0.11, 0.12, 0.7), int(6 * scale) + 4, 7.0 * scale, 1.8,
+	burst(pos, Color(0.12, 0.11, 0.12, 0.7).lerp(Color(0.35, 0.34, 0.36, 0.7), 1.0 - night), int(6 * scale) + 4, 7.0 * scale, 1.8,
 			3.5 * scale, 4.0, 60.0, 1.0, true)
 
 

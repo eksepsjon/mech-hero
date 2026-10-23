@@ -51,6 +51,7 @@ func _build_ground() -> void:
 	m.set_shader_parameter("pitch", road_pitch)
 	m.set_shader_parameter("road_w", road_width)
 	m.set_shader_parameter("half_size", World.HALF)
+	m.set_shader_parameter("night", FX.night)
 	m.set_shader_parameter("ground_mode", int(CityGenerator.VARIANTS[variant].get("ground", 0)))
 	mi.material_override = m
 	add_child(mi)
@@ -78,8 +79,8 @@ func _build_walls() -> void:
 		wall.position = spec[0]
 		add_child(wall)
 	# Holographic boundary pylons.
-	var post := FX.mat(Color(0.12, 0.12, 0.15), 0.6, 0.4)
-	var tip := FX.glow(Color(1.0, 0.2, 0.55), 6.0)
+	var post := FX.mat(Color(0.9, 0.9, 0.92), 0.2, 0.5)
+	var tip := FX.light_mat(Color(1.0, 0.25, 0.3), 6.0)
 	var t := -h
 	while t <= h + 0.1:
 		for p in [Vector2(t, -h), Vector2(t, h), Vector2(-h, t), Vector2(h, t)]:

@@ -28,7 +28,7 @@ func _configure() -> void:
 	var m := BoxMesh.new()
 	m.size = Vector3(2.4, 0.1, 60.0)
 	_line.mesh = m
-	_line_mat = FX.glow_add(accent, 3.0, 0.0)
+	_line_mat = FX.glow_mix(accent, 1.4, 0.0)
 	_line.material_override = _line_mat
 	_line.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_line.top_level = true

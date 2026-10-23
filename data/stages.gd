@@ -1,6 +1,7 @@
 extends RefCounted
 ## Stage list for one run. Each wave is a list of [enemy kind, count]; the next wave
-## drops in once most of the current one is destroyed.
+## drops in once most of the current one is destroyed. `time` is "day" (default),
+## "sunset" or "night".
 
 const STAGES := [
 	{"name": "Satoyama Farmland", "variant": "rural", "waves": [
@@ -15,7 +16,7 @@ const STAGES := [
 		[["spinner", 1], ["drone", 5]],
 		[["walker", 3], ["drone", 5]],
 	]},
-	{"name": "Neon Arcade", "variant": "downtown", "waves": [
+	{"name": "Neon Arcade", "variant": "downtown", "time": "night", "waves": [
 		[["lancer", 2], ["drone", 5]],
 		[["walker", 2], ["spinner", 1], ["drone", 4]],
 		[["lancer", 2], ["walker", 2]],
@@ -29,7 +30,7 @@ const STAGES := [
 		[["walker", 3], ["mortar", 1], ["drone", 4]],
 		[["lancer", 3], ["spinner", 1]],
 	]},
-	{"name": "Bayshore Route", "variant": "highway", "waves": [
+	{"name": "Bayshore Route", "variant": "highway", "time": "sunset", "waves": [
 		[["spinner", 2], ["drone", 6]],
 		[["lancer", 3], ["mortar", 2]],
 		[["walker", 4], ["drone", 6]],
@@ -44,5 +45,5 @@ const STAGES := [
 		[["lancer", 4], ["mortar", 2]],
 		[["spinner", 3], ["walker", 4], ["drone", 8]],
 	]},
-	{"name": "The Breach", "variant": "downtown", "boss": true, "waves": []},
+	{"name": "The Breach", "variant": "downtown", "time": "sunset", "boss": true, "waves": []},
 ]

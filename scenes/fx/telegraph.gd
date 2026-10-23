@@ -22,7 +22,7 @@ func _ready() -> void:
 	_mat.set_shader_parameter("color", color)
 	if ring_only:
 		_mat.set_shader_parameter("fill_strength", 0.0)
-		_mat.set_shader_parameter("energy", 4.0)
+		_mat.set_shader_parameter("energy", 2.5)
 	material_override = _mat
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 

@@ -3,11 +3,19 @@ extends RefCounted
 ## dictionary of named pivots so scripts can animate legs, torsos and weapons.
 ## Models face -Z.
 
-const PLAYER_ARMOR := Color(0.32, 0.4, 0.55)
-const PLAYER_TRIM := Color(0.85, 0.87, 0.9)
-const DARK := Color(0.08, 0.09, 0.12)
-const ENEMY_ARMOR := Color(0.2, 0.18, 0.22)
-const ENEMY_PLATE := Color(0.32, 0.28, 0.3)
+const PLAYER_ARMOR := Color(0.22, 0.48, 0.95)
+const PLAYER_TRIM := Color(0.95, 0.95, 0.97)
+const DARK := Color(0.2, 0.22, 0.28)
+const ENEMY_ARMOR := Color(0.32, 0.28, 0.34)
+
+
+## Enemy hull colours derived from each type's accent, so types read at a glance.
+static func enemy_armor(accent: Color) -> StandardMaterial3D:
+	return FX.mat(accent.lerp(Color(0.28, 0.27, 0.32), 0.5), 0.5, 0.45, true)
+
+
+static func enemy_plate(accent: Color) -> StandardMaterial3D:
+	return FX.mat(accent.lerp(Color(0.9, 0.88, 0.9), 0.4), 0.3, 0.5, true)
 
 
 static func box(parent: Node3D, size: Vector3, pos: Vector3, mat: Material, rot := Vector3.ZERO) -> MeshInstance3D:
@@ -70,9 +78,9 @@ static func _leg(parent: Node3D, x: float, hip_y: float, upper: Material, lower:
 # --- player ---------------------------------------------------------------------
 
 static func build_player(root: Node3D) -> Dictionary:
-	var armor := FX.mat(PLAYER_ARMOR, 0.6, 0.35)
-	var trim := FX.mat(PLAYER_TRIM, 0.4, 0.4)
-	var dark := FX.mat(DARK, 0.5, 0.6)
+	var armor := FX.mat(PLAYER_ARMOR, 0.6, 0.35, true)
+	var trim := FX.mat(PLAYER_TRIM, 0.4, 0.4, true)
+	var dark := FX.mat(DARK, 0.5, 0.6, true)
 	var cyan := FX.glow(Color(0.3, 0.9, 1.0), 5.0)
 	var orange := FX.glow(Color(1.0, 0.55, 0.15), 6.0)
 
@@ -111,8 +119,8 @@ static func build_player(root: Node3D) -> Dictionary:
 # --- enemies ----------------------------------------------------------------------
 
 static func build_drone(root: Node3D, accent: Color) -> Dictionary:
-	var armor := FX.mat(ENEMY_ARMOR, 0.6, 0.4)
-	var dark := FX.mat(DARK, 0.5, 0.5)
+	var armor := enemy_armor(accent)
+	var dark := FX.mat(DARK, 0.5, 0.5, true)
 	var eye := FX.glow(accent, 6.0)
 	var model := pivot(root, Vector3.ZERO)
 	var body := pivot(model, Vector3.ZERO)
@@ -130,9 +138,9 @@ static func build_drone(root: Node3D, accent: Color) -> Dictionary:
 
 
 static func build_walker(root: Node3D, accent: Color) -> Dictionary:
-	var armor := FX.mat(ENEMY_ARMOR, 0.6, 0.4)
-	var plate := FX.mat(ENEMY_PLATE, 0.4, 0.5)
-	var dark := FX.mat(DARK, 0.5, 0.6)
+	var armor := enemy_armor(accent)
+	var plate := enemy_plate(accent)
+	var dark := FX.mat(DARK, 0.5, 0.6, true)
 	var eye := FX.glow(accent, 6.0)
 	var model := pivot(root, Vector3.ZERO)
 	var leg_l := _leg(model, -1.9, 6.0, armor, plate, dark, eye, 1.1)
@@ -150,9 +158,9 @@ static func build_walker(root: Node3D, accent: Color) -> Dictionary:
 
 
 static func build_spinner(root: Node3D, accent: Color) -> Dictionary:
-	var armor := FX.mat(ENEMY_ARMOR, 0.6, 0.4)
-	var plate := FX.mat(ENEMY_PLATE, 0.4, 0.5)
-	var dark := FX.mat(DARK, 0.5, 0.6)
+	var armor := enemy_armor(accent)
+	var plate := enemy_plate(accent)
+	var dark := FX.mat(DARK, 0.5, 0.6, true)
 	var eye := FX.glow(accent, 6.0)
 	var model := pivot(root, Vector3.ZERO)
 	for k in 4:
@@ -174,9 +182,9 @@ static func build_spinner(root: Node3D, accent: Color) -> Dictionary:
 
 
 static func build_lancer(root: Node3D, accent: Color) -> Dictionary:
-	var armor := FX.mat(ENEMY_ARMOR, 0.6, 0.35)
-	var plate := FX.mat(Color(0.45, 0.12, 0.14), 0.4, 0.4)
-	var dark := FX.mat(DARK, 0.5, 0.6)
+	var armor := enemy_armor(accent)
+	var plate := enemy_plate(accent)
+	var dark := FX.mat(DARK, 0.5, 0.6, true)
 	var eye := FX.glow(accent, 6.0)
 	var model := pivot(root, Vector3.ZERO)
 	var leg_l := _leg(model, -1.5, 7.0, armor, plate, dark, eye, 0.9)
@@ -197,9 +205,9 @@ static func build_lancer(root: Node3D, accent: Color) -> Dictionary:
 
 
 static func build_mortar(root: Node3D, accent: Color) -> Dictionary:
-	var armor := FX.mat(ENEMY_ARMOR, 0.6, 0.4)
-	var plate := FX.mat(Color(0.35, 0.3, 0.2), 0.4, 0.5)
-	var dark := FX.mat(DARK, 0.5, 0.6)
+	var armor := enemy_armor(accent)
+	var plate := enemy_plate(accent)
+	var dark := FX.mat(DARK, 0.5, 0.6, true)
 	var eye := FX.glow(accent, 6.0)
 	var model := pivot(root, Vector3.ZERO)
 	for side in [-1.0, 1.0]:
@@ -215,9 +223,9 @@ static func build_mortar(root: Node3D, accent: Color) -> Dictionary:
 
 
 static func build_leviathan(root: Node3D) -> Dictionary:
-	var skin := FX.mat(Color(0.2, 0.26, 0.3), 0.3, 0.45)
-	var belly := FX.mat(Color(0.2, 0.22, 0.24), 0.1, 0.7)
-	var horn := FX.mat(Color(0.05, 0.05, 0.06), 0.3, 0.4)
+	var skin := FX.mat(Color(0.3, 0.48, 0.44), 0.3, 0.45, true)
+	var belly := FX.mat(Color(0.7, 0.64, 0.48), 0.1, 0.7, true)
+	var horn := FX.mat(Color(0.16, 0.15, 0.2), 0.3, 0.4, true)
 	var glow := FX.glow(Color(0.85, 0.2, 1.0), 7.0)
 	var model := pivot(root, Vector3.ZERO)
 	var body := pivot(model, Vector3.ZERO)

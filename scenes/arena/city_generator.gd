@@ -12,21 +12,21 @@ const NEON := [Color(1.0, 0.25, 0.7), Color(0.2, 0.9, 1.0), Color(1.0, 0.75, 0.2
 const VARIANTS := {
 	"downtown": {"pitch": 35.0, "road": 10.0, "min_h": 6.4, "max_h": 25.6, "tall_chance": 0.5,
 			"park_chance": 0.12, "traffic": 12, "parked": 0.55, "neon": 0.5,
-			"palette": [Color(0.22, 0.24, 0.3), Color(0.3, 0.28, 0.27), Color(0.18, 0.22, 0.26), Color(0.36, 0.35, 0.4)],
+			"palette": [Color(0.88, 0.84, 0.76), Color(0.68, 0.78, 0.88), Color(0.92, 0.72, 0.6), Color(0.74, 0.82, 0.7), Color(0.62, 0.64, 0.72)],
 			"window": Color(1.0, 0.82, 0.55)},
 	"harbor": {"pitch": 46.0, "road": 12.0, "min_h": 6.4, "max_h": 16.0, "tall_chance": 0.2,
 			"park_chance": 0.0, "traffic": 8, "parked": 0.35, "neon": 0.25, "containers": 0.55,
-			"palette": [Color(0.3, 0.32, 0.34), Color(0.25, 0.27, 0.25), Color(0.35, 0.3, 0.26)],
+			"palette": [Color(0.7, 0.72, 0.74), Color(0.62, 0.66, 0.62), Color(0.78, 0.7, 0.6)],
 			"window": Color(0.6, 0.85, 1.0)},
 	"highway": {"pitch": 70.0, "road": 18.0, "min_h": 6.4, "max_h": 19.2, "tall_chance": 0.3,
 			"park_chance": 0.1, "traffic": 24, "parked": 0.2, "neon": 0.35,
-			"palette": [Color(0.28, 0.26, 0.24), Color(0.22, 0.25, 0.28), Color(0.32, 0.32, 0.34)],
+			"palette": [Color(0.75, 0.7, 0.64), Color(0.64, 0.7, 0.76), Color(0.8, 0.8, 0.82)],
 			"window": Color(1.0, 0.7, 0.45)},
 	# Suburbs mixed with a few mid-rise blocks and parks.
 	"mixed": {"style": "mixed", "ground": 3, "pitch": 46.0, "road": 10.0, "min_h": 6.4, "max_h": 19.2,
 			"tall_chance": 0.35, "park_chance": 0.15, "house_chance": 0.6, "traffic": 10, "parked": 0.35,
 			"neon": 0.3,
-			"palette": [Color(0.3, 0.3, 0.33), Color(0.36, 0.33, 0.3), Color(0.25, 0.28, 0.32)],
+			"palette": [Color(0.82, 0.8, 0.76), Color(0.7, 0.76, 0.84), Color(0.86, 0.74, 0.66)],
 			"window": Color(1.0, 0.8, 0.55)},
 	# Farmland: one crossroads, crop fields, farmsteads with barns and silos.
 	"rural": {"style": "rural", "ground": 1, "pitch": 140.0, "road": 9.0, "traffic": 5, "parked": 0.08,
@@ -290,7 +290,7 @@ static func _backdrop(arena: Node3D, cfg: Dictionary, rng: RandomNumberGenerator
 				var h := rng.randf_range(18.0, 48.0) if far else rng.randf_range(3.2, 6.4)
 				b.size = Vector3(w, h, rng.randf_range(8.0, 13.0))
 				b.center = p
-				b.base_color = palette[rng.randi() % palette.size()].darkened(0.3)
+				b.base_color = palette[rng.randi() % palette.size()].darkened(0.12)
 				b.window_color = cfg.window
 				b.seed_value = rng.randf() * 100.0
 				arena.add_child(b)
@@ -420,8 +420,8 @@ static func _suburb(arena: Node3D, block: Rect2, rng: RandomNumberGenerator, cle
 
 static func _tree_line(arena: Node3D, rng: RandomNumberGenerator, density: float) -> void:
 	# Decorative woods outside the arena: single cone meshes, not crushable.
-	var bark := FX.mat(Color(0.05, 0.12, 0.07), 0.0, 0.9)
-	var dark := FX.mat(Color(0.04, 0.09, 0.05), 0.0, 0.9)
+	var bark := FX.mat(Color(0.16, 0.4, 0.2), 0.0, 0.9)
+	var dark := FX.mat(Color(0.12, 0.32, 0.17), 0.0, 0.9)
 	var t := -HALF - 40.0
 	while t < HALF + 40.0:
 		for depth in [8.0, 18.0, 30.0]:

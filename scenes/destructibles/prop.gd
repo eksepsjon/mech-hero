@@ -44,12 +44,12 @@ func _build_car() -> void:
 	radius = 2.3
 	color = CAR_COLORS[randi() % CAR_COLORS.size()]
 	value = randi_range(2, 9) * 1_000_000
-	var paint := FX.mat(color, 0.6, 0.3)
-	var glass := FX.mat(Color(0.05, 0.07, 0.1), 0.8, 0.1)
+	var paint := FX.mat(color, 0.6, 0.3, true)
+	var glass := FX.mat(Color(0.25, 0.35, 0.45), 0.8, 0.1)
 	MechBuilder.box(_visual, Vector3(1.9, 0.75, 4.4), Vector3(0, 0.65, 0), paint)
 	MechBuilder.box(_visual, Vector3(1.7, 0.7, 2.3), Vector3(0, 1.35, 0.25), glass)
-	var head := FX.glow(Color(1.0, 0.95, 0.8), 5.0)
-	var tail := FX.glow(Color(1.0, 0.1, 0.1), 4.0)
+	var head := FX.light_mat(Color(1.0, 0.95, 0.8), 5.0)
+	var tail := FX.light_mat(Color(1.0, 0.1, 0.1), 4.0)
 	for x in [-0.65, 0.65]:
 		MechBuilder.box(_visual, Vector3(0.45, 0.22, 0.1), Vector3(x, 0.75, -2.22), head)
 		MechBuilder.box(_visual, Vector3(0.45, 0.2, 0.1), Vector3(x, 0.75, 2.22), tail)
@@ -61,14 +61,14 @@ func _build_lamp() -> void:
 	var pole := FX.mat(Color(0.25, 0.27, 0.3), 0.7, 0.4)
 	MechBuilder.cyl(_visual, 0.12, 0.18, 6.0, Vector3(0, 3.0, 0), pole, Vector3.ZERO, 6)
 	MechBuilder.box(_visual, Vector3(0.15, 0.15, 1.6), Vector3(0, 5.9, -0.7), pole)
-	MechBuilder.box(_visual, Vector3(0.5, 0.2, 0.7), Vector3(0, 5.8, -1.4), FX.glow(Color(1.0, 0.85, 0.6), 6.0))
+	MechBuilder.box(_visual, Vector3(0.5, 0.2, 0.7), Vector3(0, 5.8, -1.4), FX.light_mat(Color(1.0, 0.85, 0.6), 6.0))
 
 
 func _build_tree() -> void:
 	radius = 1.6
 	value = 200_000
-	MechBuilder.cyl(_visual, 0.25, 0.35, 2.4, Vector3(0, 1.2, 0), FX.mat(Color(0.2, 0.13, 0.08), 0.0, 0.9), Vector3.ZERO, 6)
-	var leaves := FX.mat(Color(0.08, 0.25, 0.12), 0.0, 0.9)
+	MechBuilder.cyl(_visual, 0.25, 0.35, 2.4, Vector3(0, 1.2, 0), FX.mat(Color(0.42, 0.28, 0.16), 0.0, 0.9), Vector3.ZERO, 6)
+	var leaves := FX.mat([Color(0.3, 0.6, 0.22), Color(0.38, 0.66, 0.26), Color(0.25, 0.52, 0.2)][randi() % 3], 0.0, 0.9)
 	MechBuilder.ball(_visual, 1.6, Vector3(0, 3.4, 0), leaves, Vector3.ONE, 8)
 	MechBuilder.ball(_visual, 1.1, Vector3(0.6, 4.5, 0.3), leaves, Vector3.ONE, 8)
 
@@ -78,8 +78,8 @@ func _build_pine() -> void:
 	value = 150_000
 	var s := randf_range(0.8, 1.35)
 	_visual.scale = Vector3.ONE * s
-	MechBuilder.cyl(_visual, 0.2, 0.3, 2.0, Vector3(0, 1.0, 0), FX.mat(Color(0.2, 0.13, 0.08), 0.0, 0.9), Vector3.ZERO, 6)
-	var needles := FX.mat([Color(0.05, 0.16, 0.08), Color(0.04, 0.12, 0.07), Color(0.07, 0.18, 0.1)][randi() % 3], 0.0, 0.9)
+	MechBuilder.cyl(_visual, 0.2, 0.3, 2.0, Vector3(0, 1.0, 0), FX.mat(Color(0.42, 0.28, 0.16), 0.0, 0.9), Vector3.ZERO, 6)
+	var needles := FX.mat([Color(0.16, 0.42, 0.22), Color(0.12, 0.36, 0.2), Color(0.2, 0.46, 0.24)][randi() % 3], 0.0, 0.9)
 	MechBuilder.cyl(_visual, 0.0, 2.0, 4.0, Vector3(0, 3.5, 0), needles, Vector3.ZERO, 7)
 	MechBuilder.cyl(_visual, 0.0, 1.4, 3.2, Vector3(0, 5.6, 0), needles, Vector3.ZERO, 7)
 
@@ -96,7 +96,7 @@ func _build_kiosk() -> void:
 	var body := FX.mat(Color(0.85, 0.85, 0.88), 0.3, 0.5)
 	MechBuilder.box(_visual, Vector3(1.4, 2.2, 1.0), Vector3(0, 1.1, 0), body)
 	var c: Color = [Color(1.0, 0.2, 0.4), Color(0.2, 0.8, 1.0), Color(1.0, 0.8, 0.2)][randi() % 3]
-	MechBuilder.box(_visual, Vector3(1.2, 1.4, 0.1), Vector3(0, 1.3, -0.52), FX.glow(c, 3.0))
+	MechBuilder.box(_visual, Vector3(1.2, 1.4, 0.1), Vector3(0, 1.3, -0.52), FX.light_mat(c, 3.0))
 
 
 func drive(delta: float) -> void:
