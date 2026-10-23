@@ -1,0 +1,48 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Mech Hero"
+config/description="Isometric mech-vs-kaiju roguelite shooter."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.5", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Game="*res://autoload/game_state.gd"
+World="*res://autoload/world.gd"
+FX="*res://autoload/fx.gd"
+Bullets="*res://autoload/bullet_manager.gd"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[layer_names]
+
+3d_physics/layer_1="buildings"
+3d_physics/layer_2="arena_walls"
+3d_physics/layer_3="player"
+3d_physics/layer_4="enemies"
+3d_physics/layer_5="debris"
+3d_physics/layer_6="ground"
+
+[physics]
+
+common/physics_ticks_per_second=60
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=2
