@@ -27,8 +27,13 @@ particles, so there are no art assets.
 
 ## The loop
 
-- **10 stages**: 8 combat districts (downtown, harbor, highway), an elite strike
-  group on stage 5, and the kaiju **Leviathan** on stage 10.
+- **10 stages** across six district types, an elite strike group on stage 5, and
+  the kaiju **Leviathan** on stage 10:
+  - **Rural**: one crossroads through crop fields, farmsteads with barns and silos, hay bales.
+  - **Mixed**: suburban houses with pitched roofs, gardens, a few mid-rise blocks.
+  - **Forest**: dense pines with clearings, cabins and fire watchtowers. Little hard cover.
+  - **Downtown**: dense neon towers. **Harbor**: container stacks and warehouses.
+    **Highway**: wide roads, heavy traffic, sparse industry.
 - Enemies drop from orbit in waves. Clear them all, then walk into the green
   **extraction gate** to pick **1 of 3 upgrades** (18 in the pool, most stackable),
   repair 20% hull, and move on.

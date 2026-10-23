@@ -67,6 +67,15 @@ func _main() -> void:
 		await _frames(1)
 	await _shot("04_combat_later")
 
+	# One combat shot per district type.
+	for stage in [1, 2, 3]:
+		run._build_stage.call_deferred(stage)
+		await _frames(260)
+		for k in 200:
+			_drive(World.player, k / 60.0)
+			await _frames(1)
+		await _shot("04_%s" % Game.current_stage().variant)
+
 	# Stage with mixed elites and spinners, partly upgraded.
 	for id in ["multishot", "multishot", "diagonal", "orbitals", "missiles", "ricochet"]:
 		Game.apply_powerup(id)

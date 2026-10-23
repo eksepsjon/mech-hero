@@ -76,7 +76,7 @@ func _build_stage(index: int) -> void:
 	World.reset()
 	World.run = self
 	var def := Game.current_stage()
-	_env = Env.build(is_boss_stage())
+	_env = Env.build(is_boss_stage(), def.variant in ["rural", "forest"])
 	add_child(_env)
 	arena = Arena.new()
 	arena.variant = def.variant

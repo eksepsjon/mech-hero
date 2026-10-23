@@ -1,6 +1,6 @@
 extends Node3D
-## Small street prop the mechs crush underfoot: cars (some drive, some explode),
-## street lamps, trees and kiosks. Kept tiny on purpose to sell the mech scale.
+## Small prop the mechs crush underfoot: cars (some drive, some explode),
+## street lamps, trees, pines, hay bales and kiosks. Kept tiny on purpose to sell the mech scale.
 
 const MechBuilder := preload("res://scenes/mechs/mech_builder.gd")
 const CAR_COLORS := [Color(0.8, 0.1, 0.12), Color(0.9, 0.9, 0.92), Color(0.1, 0.12, 0.15),
@@ -30,6 +30,10 @@ func _ready() -> void:
 			_build_tree()
 		"kiosk":
 			_build_kiosk()
+		"pine":
+			_build_pine()
+		"haybale":
+			_build_haybale()
 
 
 func pos2() -> Vector2:
@@ -67,6 +71,23 @@ func _build_tree() -> void:
 	var leaves := FX.mat(Color(0.08, 0.25, 0.12), 0.0, 0.9)
 	MechBuilder.ball(_visual, 1.6, Vector3(0, 3.4, 0), leaves, Vector3.ONE, 8)
 	MechBuilder.ball(_visual, 1.1, Vector3(0.6, 4.5, 0.3), leaves, Vector3.ONE, 8)
+
+
+func _build_pine() -> void:
+	radius = 1.5
+	value = 150_000
+	var s := randf_range(0.8, 1.35)
+	_visual.scale = Vector3.ONE * s
+	MechBuilder.cyl(_visual, 0.2, 0.3, 2.0, Vector3(0, 1.0, 0), FX.mat(Color(0.2, 0.13, 0.08), 0.0, 0.9), Vector3.ZERO, 6)
+	var needles := FX.mat([Color(0.05, 0.16, 0.08), Color(0.04, 0.12, 0.07), Color(0.07, 0.18, 0.1)][randi() % 3], 0.0, 0.9)
+	MechBuilder.cyl(_visual, 0.0, 2.0, 4.0, Vector3(0, 3.5, 0), needles, Vector3.ZERO, 7)
+	MechBuilder.cyl(_visual, 0.0, 1.4, 3.2, Vector3(0, 5.6, 0), needles, Vector3.ZERO, 7)
+
+
+func _build_haybale() -> void:
+	radius = 1.2
+	value = 40_000
+	MechBuilder.cyl(_visual, 0.9, 0.9, 1.6, Vector3(0, 0.9, 0), FX.mat(Color(0.6, 0.48, 0.2), 0.0, 1.0), Vector3(0, 0, 90), 10)
 
 
 func _build_kiosk() -> void:
@@ -117,8 +138,13 @@ func crush(by_player: bool) -> void:
 			FX.sparks(p + Vector3(0, 5, 0), Color(0.7, 0.85, 1.0), 10)
 			World.debris(p + Vector3(0, 3, 0), 2, Color(0.3, 0.3, 0.32), 0.4, 6.0)
 			visible = false
-		"tree":
-			World.debris(p + Vector3(0, 3, 0), 3, Color(0.1, 0.3, 0.12), 0.7, 7.0)
+		"tree", "pine":
+			World.debris(p + Vector3(0, 3, 0), 3, Color(0.08, 0.25, 0.1), 0.7, 7.0)
+			FX.burst(p + Vector3(0, 3, 0), Color(0.3, 0.8, 0.3), 8, 8.0, 0.6, 0.5, -15.0, 120.0, 1.5)
+			visible = false
+		"haybale":
+			World.debris(p + Vector3(0, 1, 0), 2, Color(0.6, 0.48, 0.2), 0.5, 7.0)
+			FX.burst(p + Vector3(0, 1, 0), Color(0.9, 0.75, 0.3), 12, 10.0, 0.8, 0.4, -12.0, 140.0, 1.5)
 			visible = false
 		_:
 			FX.sparks(p + Vector3(0, 1, 0), Color(1.0, 0.9, 0.5), 8)

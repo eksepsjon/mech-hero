@@ -11,9 +11,9 @@ var _boom := 2.0
 
 
 func _ready() -> void:
-	add_child(Env.build(false))
 	var arena = Arena.new()
-	arena.variant = ["downtown", "harbor", "highway"][randi() % 3]
+	arena.variant = ["downtown", "harbor", "highway", "mixed", "rural", "forest"][randi() % 6]
+	add_child(Env.build(false, arena.variant in ["rural", "forest"]))
 	arena.gen_seed = randi()
 	add_child(arena)
 	_cam = Camera3D.new()

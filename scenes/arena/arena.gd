@@ -13,8 +13,11 @@ var gen_seed := 1
 var spawn_pos := Vector2(50, 50)
 var gate_pos := Vector2(-58, -58)
 var gate_open := false
+const PROP_CELL := 8.0
+
 var props: Array = []
 var traffic: Array = []
+var _prop_cells: Dictionary = {}
 var road_pitch := 35.0
 var road_width := 10.0
 
@@ -48,6 +51,7 @@ func _build_ground() -> void:
 	m.set_shader_parameter("pitch", road_pitch)
 	m.set_shader_parameter("road_w", road_width)
 	m.set_shader_parameter("half_size", World.HALF)
+	m.set_shader_parameter("ground_mode", int(CityGenerator.VARIANTS[variant].get("ground", 0)))
 	mi.material_override = m
 	add_child(mi)
 	var ground := StaticBody3D.new()
@@ -125,17 +129,49 @@ func open_gate() -> void:
 	marker.global_position = Vector3(gate_pos.x, 0.25, gate_pos.y)
 
 
+## Static props live in a coarse grid so crush checks stay cheap in dense forests.
+func add_prop(prop) -> void:
+	props.append(prop)
+	var c := _prop_cell(prop.pos2())
+	if not _prop_cells.has(c):
+		_prop_cells[c] = []
+	_prop_cells[c].append(prop)
+
+
+func set_prop_moving(prop) -> void:
+	var c := _prop_cell(prop.pos2())
+	if _prop_cells.has(c):
+		_prop_cells[c].erase(prop)
+	traffic.append(prop)
+
+
+func _prop_cell(p: Vector2) -> Vector2i:
+	return Vector2i(int(floor(p.x / PROP_CELL)), int(floor(p.y / PROP_CELL)))
+
+
 ## Crushes every prop touching the circle. Returns how many were crushed.
 func crush_props_in(p: Vector2, r: float, by_player: bool) -> int:
 	var n := 0
-	for prop in props:
-		if prop.crushed:
-			continue
-		var rr: float = r + prop.radius
-		if p.distance_squared_to(prop.pos2()) < rr * rr:
-			prop.crush(by_player)
-			n += 1
+	var reach := r + 2.5  # largest prop radius
+	var lo := _prop_cell(p - Vector2(reach, reach))
+	var hi := _prop_cell(p + Vector2(reach, reach))
+	for x in range(lo.x, hi.x + 1):
+		for y in range(lo.y, hi.y + 1):
+			for prop in _prop_cells.get(Vector2i(x, y), World.EMPTY):
+				n += _try_crush(prop, p, r, by_player)
+	for prop in traffic:
+		n += _try_crush(prop, p, r, by_player)
 	return n
+
+
+func _try_crush(prop, p: Vector2, r: float, by_player: bool) -> int:
+	if prop.crushed:
+		return 0
+	var rr: float = r + prop.radius
+	if p.distance_squared_to(prop.pos2()) < rr * rr:
+		prop.crush(by_player)
+		return 1
+	return 0
 
 
 func _physics_process(delta: float) -> void:

@@ -8,6 +8,14 @@ const SHADER := preload("res://shaders/building.gdshader")
 const DECOR_SHADER := preload("res://shaders/building_decor.gdshader")
 const MechBuilder := preload("res://scenes/mechs/mech_builder.gd")
 
+const WINDOWLESS := ["container", "barn", "silo"]
+const ROOF_COLORS := {
+	"house": [Color(0.25, 0.12, 0.1), Color(0.15, 0.17, 0.2), Color(0.3, 0.2, 0.14)],
+	"farmhouse": [Color(0.3, 0.1, 0.08)],
+	"barn": [Color(0.18, 0.18, 0.2)],
+	"cabin": [Color(0.12, 0.16, 0.12)],
+}
+
 static var _shared_mat: ShaderMaterial
 
 var size := Vector3(10, 15, 10)
@@ -45,9 +53,17 @@ func _ready() -> void:
 	_visual = Node3D.new()
 	add_child(_visual)
 	_mesh = MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = size
-	_mesh.mesh = bm
+	if kind == "silo":
+		var cm := CylinderMesh.new()
+		cm.top_radius = size.x * 0.5
+		cm.bottom_radius = size.x * 0.5
+		cm.height = size.y
+		cm.radial_segments = 16
+		_mesh.mesh = cm
+	else:
+		var bm := BoxMesh.new()
+		bm.size = size
+		_mesh.mesh = bm
 	_mesh.position.y = size.y * 0.5
 	_visual.add_child(_mesh)
 	if decor:
@@ -65,7 +81,7 @@ func _ready() -> void:
 	_mesh.material_override = _shared_mat
 	_mesh.set_instance_shader_parameter("base_color", base_color)
 	var wc := window_color
-	wc.a = 0.0 if kind == "container" else 1.0
+	wc.a = 0.0 if kind in WINDOWLESS else 1.0
 	_mesh.set_instance_shader_parameter("window_color", wc)
 	_push_params()
 	_add_details()
@@ -89,6 +105,19 @@ func _add_details() -> void:
 	var top := size.y
 	if kind == "container":
 		return
+	if ROOF_COLORS.has(kind):
+		_add_roof()
+		return
+	if kind == "silo":
+		MechBuilder.ball(_visual, size.x * 0.5, Vector3(0, top, 0), FX.mat(base_color.lightened(0.1), 0.6, 0.3),
+				Vector3(1, 0.5, 1), 16)
+		return
+	if kind == "watchtower":
+		# Cabin on top and a red aviation light.
+		MechBuilder.box(_visual, Vector3(size.x + 2.0, 2.4, size.z + 2.0), Vector3(0, top + 1.2, 0), FX.mat(Color(0.3, 0.2, 0.12), 0.1, 0.8))
+		MechBuilder.box(_visual, Vector3(size.x + 1.5, 0.5, size.z + 1.5), Vector3(0, top + 1.2, 0), FX.glow(Color(1.0, 0.75, 0.4), 3.0))
+		MechBuilder.ball(_visual, 0.4, Vector3(0, top + 3.0, 0), FX.glow(Color(1.0, 0.1, 0.1), 6.0))
+		return
 	var dark := FX.mat(base_color.darkened(0.5), 0.4, 0.6)
 	# Roof clutter: AC units, a water tank or an antenna with a blinking light.
 	var n := clampi(int(size.x * size.z / 40.0), 1, 4)
@@ -108,6 +137,29 @@ func _add_details() -> void:
 		var h := minf(size.y * 0.6, 12.0)
 		MechBuilder.box(_visual, Vector3(0.4, h, 1.6), Vector3(side * (size.x * 0.5 + 0.2), size.y - h * 0.5 - 1.0, size.z * 0.3), FX.glow(neon_color, 5.0))
 		MechBuilder.box(_visual, Vector3(size.x, 0.35, 0.35), Vector3(0, top - 0.2, size.z * 0.5 + 0.15), FX.glow(neon_color.lerp(Color.WHITE, 0.3), 4.0))
+
+
+## Pitched roof: a prism along the building's long axis.
+func _add_roof() -> void:
+	var colors: Array = ROOF_COLORS[kind]
+	var roof_color: Color = colors[int(seed_value) % colors.size()]
+	var along_z := size.z >= size.x
+	var span := size.x if along_z else size.z
+	var h := span * (0.55 if kind == "barn" else 0.45)
+	var pm := PrismMesh.new()
+	pm.size = Vector3(span + 0.8, h, (size.z if along_z else size.x) + 0.8)
+	var roof := MeshInstance3D.new()
+	roof.mesh = pm
+	roof.material_override = FX.mat(roof_color, 0.2, 0.7)
+	roof.position.y = size.y + h * 0.5
+	roof.rotation.y = 0.0 if along_z else PI * 0.5
+	_visual.add_child(roof)
+	if kind == "barn":
+		# Big doors and a hay-loft light so barns read at a glance.
+		MechBuilder.box(_visual, Vector3(size.x * 0.4, size.y * 0.6, 0.2), Vector3(0, size.y * 0.3, size.z * 0.5 + 0.1), FX.mat(Color(0.85, 0.82, 0.75), 0.0, 0.8))
+		MechBuilder.box(_visual, Vector3(1.4, 1.0, 0.2), Vector3(0, size.y * 0.8, size.z * 0.5 + 0.1), FX.glow(Color(1.0, 0.75, 0.4), 3.0))
+	else:
+		MechBuilder.box(_visual, Vector3(0.6, h + 1.0, 0.6), Vector3(size.x * 0.25, size.y + h * 0.5 + 0.5, size.z * 0.15), FX.mat(Color(0.25, 0.2, 0.18), 0.0, 0.9))
 
 
 func take_damage(amount: float, from_player: bool = false) -> void:

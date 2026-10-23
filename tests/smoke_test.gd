@@ -29,7 +29,25 @@ func _god_mode() -> void:
 	Game.player_hp = 1e9
 
 
+func _check_variants() -> void:
+	var Arena := preload("res://scenes/arena/arena.gd")
+	for v in preload("res://scenes/arena/city_generator.gd").VARIANTS:
+		World.reset()
+		var a = Arena.new()
+		a.variant = v
+		a.gen_seed = 99
+		add_child(a)
+		var crushed: int = a.crush_props_in(Vector2(0, 0), 200.0, false)
+		_check(World.buildings.size() >= 3 and a.props.size() > 20 and crushed == a.props.size(),
+				"district '%s' generates (%d buildings, %d props)" % [v, World.buildings.size(), a.props.size()])
+		remove_child(a)
+		a.free()
+	World.reset()
+	Bullets.clear()
+
+
 func _main() -> void:
+	_check_variants()
 	Game.new_run(12345)
 	_god_mode()
 	run = Run.new()
@@ -67,18 +85,18 @@ func _main() -> void:
 	await _frames(120)
 	_check(is_instance_valid(b), "collapsed building leaves rubble node")
 
-	# Walking onto a car crushes it.
+	# Walking onto a prop (car, hay bale, tree...) crushes it.
 	var car = null
 	for p in World.arena.props:
-		if p.kind == "car" and not p.crushed and p.drive_speed == 0.0:
+		if not p.crushed and p.drive_speed == 0.0:
 			car = p
 			break
-	_check(car != null, "found a parked car")
+	_check(car != null, "found a static prop")
 	if car != null:
 		var collateral0 := Game.collateral
 		player.global_position = Vector3(car.position.x, 0, car.position.z)
 		await _frames(3)
-		_check(car.crushed, "player crushes car underfoot")
+		_check(car.crushed, "player crushes %s underfoot" % car.kind)
 		_check(Game.collateral > collateral0, "collateral counter increases")
 
 	# Pushing into a building grinds it down.
