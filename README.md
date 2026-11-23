@@ -75,6 +75,17 @@ tests/         headless smoke test, parse check, screenshot capture
 docs/          iteration plan
 ```
 
+## Web build (GitHub Pages)
+
+`.github/workflows/deploy-pages.yml` exports the **Web** preset from
+`export_presets.cfg` with Godot 4.5 and deploys it to GitHub Pages on every push to
+`main` (or run it by hand from the Actions tab). One-time setup: in the repo's
+**Settings → Pages**, set **Source** to **GitHub Actions**.
+
+The web build uses Godot's Compatibility (WebGL 2) renderer and is exported without
+thread support, because GitHub Pages can't send the cross-origin isolation headers
+that threads need.
+
 ## Tests
 
 ```sh
